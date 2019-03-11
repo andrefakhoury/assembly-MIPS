@@ -267,3 +267,43 @@ A0 a+3
 .align 0	#align char values (2^0 bytes)
 ```
 
+## Memory structure
+
+-------------
+|			|	--sp (stack pointer)
+|	Stack	|	addi $sp, $sp, -8 #sp goes down
+|		|	|
+|		|	|
+|		V	|
+|			|
+-------------
+|			|
+|	Data	|
+|		^ 	|
+|		|	|
+|		|	|
+|			|
+-------------
+|	Code	|
+-------------
+
+## Memory commands
+
+```assembly
+lw $a0, 0($sp)
+# $a0 -> dest reg
+# 0 -> shift
+# $sp -> base reg
+
+sw $a0, 0($sp)
+# inverse of lw
+
+#lw: load from memory to reg
+#sw: stores from reg to memory
+```
+
+Jump options:
+-j label: just jump
+-$ra = return address
+-jal = jump and link: jump and $ra = PC
+-jr $ra = jump register
