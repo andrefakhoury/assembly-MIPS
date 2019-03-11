@@ -9,6 +9,15 @@ Some MIPS Assembly codes and notes I made to my Organization and Architecture of
 ## Assembly Simulator
 I'm using the [MARS MIPS Simulator](http://courses.missouristate.edu/KenVollmar/mars/download.htm).
 
+## MIPS Architecture
+MIPS: Microprocessor without interlocked pipeline stages
+-32 bits
+-32 "general purposes" registers
+-32 "floating points" registers
+
+## Labels
+-Used to identify some line by reference.
+
 ## Data Types
 Instructions are 32-bits.
 -Byte (8 bits), halfword (2 bytes), word (4 bytes);
@@ -221,3 +230,40 @@ Is equal to this:
 ```c
 *REG_tmp = *REG_1 < *REG_2;
 ```
+
+## Memory Access
+-Each word has 32 bits
+-Byte addressing: the starting address of each word always begin in a multiple of 4
+
+## Endianness
+
+### Big-Endian
+-Stores the most significant byte at the lowest address.
+
+A0BA0E41 will be stored like this:
+A0 a
+BA a+1
+0E a+2
+41 a+3
+
+### Little-Endian
+-Stores the most significant byte at the highest address.
+
+A0BA0E41 will be stored like this:
+41 a
+0E a+1
+BA a+2
+A0 a+3
+
+### Bi-Endian (MIPS)
+-Mixed capacity, according to the host machine.
+
+## .align
+
+.align n: the data is stored in 2^n bytes (on the memory).
+
+```assembly
+.align 2	#align integer values (2^2 bytes)
+.align 0	#align char values (2^0 bytes)
+```
+
