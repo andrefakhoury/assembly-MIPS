@@ -1,13 +1,16 @@
 	.data
 str_menu: .asciiz "Selecione uma opcao:\n1. Soma de dois numeros\n2. Subtracao de dois numeros\n3. Multiplicacao de dois numeros\n4. Divisao de dois numeros\n5. Potencia\n6. Raiz Quadrada\n7. Tabuada de um numero\n8. Calculo do IMC\n9. Fatorial de um numero\n10. Fibonacci\n0. Encerrar o programa\n"
 str_num:  .asciiz "Digite um numero: "
+str_num_float:  .asciiz "Digite um numero de ponto flutuante: "
 str_sum:  .asciiz " + "
 str_sub:  .asciiz " - "
 str_mul:  .asciiz " * "
 str_div:  .asciiz " / "
 str_pot:  .asciiz " ^ "
 str_equ:  .asciiz " = "
-str_endl: .asciiz "\n\n"
+str_sqt:  .asciiz "Raiz quadrada de "
+str_fat:  .asciiz "Fatorial de "
+str_endl: .asciiz "\n"
 
 	.text
 	.globl main
@@ -34,8 +37,17 @@ main:
 	addi $t1, $zero, 4	# t1 = 4, opcao de divisao
 	beq $t0, $t1, divisao	# vai para a divisao
 	
-	addi $t1, $zero, 5	# t1 = 4, opcao de potencia
+	addi $t1, $zero, 5	# t1 = 5, opcao de potencia
 	beq $t0, $t1, potencia	# vai para a potencia
+	
+	addi $t1, $zero, 6	# t1 = 6, opcao de raiz quadrada
+	beq $t0, $t1, raiz	# vai para a raiz quadrada
+	
+	addi $t1, $zero, 7	# t1 = 7, opcao de tabuada
+	beq $t0, $t1, tabuada	# vai para a tabuada
+	
+	addi $t1, $zero, 9	# t1 = 9, opcao de fatorial
+	beq $t0, $t1, fatorial	# vai para o fatorial
 	
 	addi $t1, $zero, 0	# t1 = 0, opcao de encerrar programa
 	beq $t0, $t1, fim_prog	# encerra o programa
@@ -151,20 +163,118 @@ fim_loop_pot:
 	j main			#fim da execucao, volta para a main
 
 raiz:
-	jal le_num
-	move $t1, $v0
+	li $v0, 4
+	la $a0, str_num_float
+	syscall
 	
-	div $t3, $t1, $t2
+	li $v0, 6
+	syscall
 	
-	move $a0, $t1
-	move $a1, $t2
-	la $a2, str_div
-	move $a3, $t3
-	jal imp_res	
+	mov.s $f1, $f0
+	sqrt.s $f2, $f1
+	
+	li $a0, 4
+	la $a0, str_sqt
+	syscall
+	
+	li $a0, 2
+	mov.s $f12, $f1
+	syscall
+	
+	li $a0, 4
+	la $a0, str_equ
+	syscall
+	
+	li $a0, 2
+	mov.s $f12, $f2
+	syscall
 	
 	j main			#fim da execucao, volta para a main
 	
+tabuada:
+	jal le_num
+	move $t1, $v0
 	
+	# eu tenho que partir de 1 ate 10, e fazer a multiplicacao de t1 * atual
+	
+	li $t2, 1	# t2 = count
+	li $t3, 11	# t3 = condicao de parada
+	
+loop_tabuada:
+	beq $t2, $t3, fim_loop_tabuada
+	mul $t4, $t1, $t2
+	
+	# imprime o resultado atual
+	move $a0, $t1	# # #
+	move $a1, $t2	# # #
+	la $a2, str_mul	# # #
+	move $a3, $t4	# # #
+	jal imp_res	# # #
+	# fim da impressao atual
+	
+	addi $t2, $t2, 1 # acrescenta o contador
+	j loop_tabuada
+
+fim_loop_tabuada:
+	# acabou o loop, basta voltar a main
+	j main			#fim da execucao, volta para a main
+	
+
+
+fatorial:
+	jal le_num
+	move $a0, $v0
+	jal calc_fatorial
+	
+	move $t1, $a0	#numero
+	move $t2, $v0	#fatorial
+	
+	li $v0, 4
+	la $a0, str_fat
+	syscall
+	
+	li $v0, 1
+	move $a0, $t1
+	syscall
+	
+	li $v0, 4
+	la $a0, str_equ
+	syscall
+	
+	li $v0, 1
+	move $a0, $t2
+	syscall
+	
+	li $v0, 4
+	la $a0, str_endl
+	syscall
+	
+	j main
+	
+
+
+## Calcula o fatorial do numero enviado em $a0, e retorna em $v0.
+calc_fatorial:
+	addi $sp, $sp, -8
+	sw $a0, 0($sp)
+	sw $ra, 4($sp)
+	
+	addi $v0, $zero, 1 #fatorial
+	addi $t1, $zero, 1 #count
+	
+loop_fac:
+	beq $a0, $t1, fim_loop_fac
+	mul $v0, $v0, $a0
+	addi $a0, $a0, -1
+	j loop_fac
+
+fim_loop_fac:	
+	lw $a0, 0($sp)
+	lw $ra, 4($sp)
+	addi $sp, $sp, 8
+	jr $ra
+
+		
 ## Imprime o resultado da operacao binaria no seguinte estilo: a OP b = c
 ## Sendo que OP deve ser uma string, representando a operacao (*, /, +, -, ...)
 ## Registradores utilizados:

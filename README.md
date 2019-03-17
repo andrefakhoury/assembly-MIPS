@@ -1,3 +1,98 @@
+# Resumo de Antes
+
+## Sistema Operacional
+Conjunto de hardware e software usado como ferramenta na solução de problemas.
+
+Arquitetura é o conjunto de atributos visíveis ao programador (conj. de instruções, número de bits usados para representação de dados, mecanismos de E/S, etc).
+
+Organização é como esses atributos estão implementados (sinais de controle, interfaces, tecnologia de memória).
+
+Normalmente, as famílias de processador e tals compartilham a mesma arquitetura básica, mas a organização varia entre as diferentes versões.
+
+## Arquitetura de von Neumann
+
+Composta por conjunto de componentes lógicos básicos + programação.
+
+- Dados e instruções são representados na memória;
+- A memória é enderaçada pela posição e não pelo conteúdo; 
+- A execução das instruções é considerada sequencial;
+
+Hardware de proósito geral
+	
+- Programa determina uma sequência de passos; cada operação requer sinais de controle diferentes;
+
+Função da Unidade de Controle
+
+- Para cada operação, um código único é fornecido: ADD, MOVE...
+- Função da unidade de controle: interpretar o código e gerar os sinais de controle que executarão a instrução requerida
+
+### Componentes
+
+CPU (UC + ULA)
+- Patterson & Hennessy: UC + Caminho de Dados (barramento interno + unidades funcionais)
+
+E/S - comunicação com o mundo exterior
+- permite inserir dados e instruções no computador
+- permite enviar resultados para fora do computador
+
+Memória principal - responsável por:
+- fornecer instruções e operandos para execução
+- armazenar resultados fora da CPU
+
+![Visao geral](https://i.imgur.com/rRJn4Uc.png)
+
+### Registradores Principais
+
+- PC: program counter - aponta para próx. instrução
+- IR: Instruction Register - instrução que está sendo executada
+- AC: Accumulator - armazena temporariamente alguns dados
+- MAR: Memory Address Register
+- MBR: Memory Buffer Register
+
+### Ciclo de Instrução
+Dois passos:
+- Ciclo de busca (fetch)
+- Ciclo de Execução (execute)
+
+![ciclo de instrucao](https://i.imgur.com/o6HeGbm.png)
+
+### Ciclo de Busca
+(PC) já está com o endereço da próxima instrução a ser executada
+
+(MAR) <- PC
+
+(MBR) <- MEM(MAR)
+
+(IR) <- (MBR)
+
+(PC) <- (PC) + 1
+
+
+### Ciclo de Execução
+- Decodificação da instrução (UC decodifica a instrução e determina quais ações são necessárias, ou seja, a UC configura os sinais de controle de acordo com a instrução)
+- A execução pode ser uma das instruções:
+
+Processador-Memória: transferência de dados do processador para a memória ou da memória para o processador
+
+Processador-E/S: transferência de dados entre o processador e um dispositivo de E/S
+
+Processamento de dados: execução de operações aritméticas ou lógicas sobre os dados
+
+Controle: especifica que a sequência de execução de instruções seja alterada
+
+Combinação dessas 4 possibilidades
+
+### Visão de uma Máquina Hipotética
+Operações:
+- 0001: (AC) <- (MEM)
+- 0010: (MEM) <- (AC)
+- 0101: (AC) <- (AC) + (MEM)
+
+### Arquitetura Simples
+Instruções de 16 bits:
+
+endereço (12) | opcode (4)
+
 # MIPS Assembly
 Some MIPS Assembly codes and notes I made to my Organization and Architecture of Computers classes.
 
@@ -7,7 +102,7 @@ Some MIPS Assembly codes and notes I made to my Organization and Architecture of
 # Notes
 
 ## Assembly Simulator
-I'm using the [MARS MIPS Simulator](http://courses.missouristate.edu/KenVollmar/mars/download.htm).
+I'm currently using the [MARS MIPS Simulator](http://courses.missouristate.edu/KenVollmar/mars/download.htm).
 
 ## MIPS Architecture
 MIPS: Microprocessor without interlocked pipeline stages
@@ -269,23 +364,41 @@ A0 a+3
 
 ## Memory structure
 
--------------
-|			|	--sp (stack pointer)
-|	Stack	|	addi $sp, $sp, -8 #sp goes down
-|		|	|
-|		|	|
-|		V	|
-|			|
--------------
-|			|
-|	Data	|
-|		^ 	|
-|		|	|
-|		|	|
-|			|
--------------
-|	Code	|
--------------
+
+|  RAM	   |
+|:--------:|
+|  STACK ↓ |
+|   DATA ↑ |
+|   CODE   |
+
+On stack, we have a Stack Pointer. So, when pushing something to the stack, we have to move the ```sp``` down the stack. We make it by using ```addi $sp, $sp, - <qtt_words * 4>```.
+
+Remember: ```jr``` points to the last used space.
+
+A default function call:
+
+```assembly
+## Evaluates the factorial of $a0, storing the answer in $v0.
+calc_factorial:
+	addi $sp, $sp, -8	# # #
+	sw $a0, 0($sp)		# pushing the numbers to the stack
+	sw $ra, 4($sp)		# # #
+	
+	addi $v0, $zero, 1 #factorial	# # #
+	addi $t1, $zero, 1 #count		# Setting default values
+	
+loop_fac:
+	beq $a0, $t1, end_loop_fac	# # #
+	mul $v0, $v0, $a0			# Basic loop to calculate the factorial
+	addi $a0, $a0, -1			# Decreasing the a0 value
+	j loop_fac					# # #
+
+end_loop_fac:	
+	lw $a0, 0($sp)		# # #
+	lw $ra, 4($sp)		# Going back to the original values
+	addi $sp, $sp, 8	# # #
+	jr $ra				# Jumping back to the function that called it
+```
 
 ## Memory commands
 
@@ -307,3 +420,15 @@ Jump options:
 -$ra = return address
 -jal = jump and link: jump and $ra = PC
 -jr $ra = jump register
+
+
+## Dynamic Allocation
+
+```assembly
+li $v0, 9
+li $a0, 40
+syscall
+```
+- v0 = 9: opt code for allocation
+- a0 = 40: bytes to alloc
+- the first address of the alloc'd space is stored on $v0.
