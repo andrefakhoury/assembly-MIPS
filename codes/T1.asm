@@ -10,6 +10,9 @@ str_pot:  .asciiz " ^ "
 str_equ:  .asciiz " = "
 str_sqt:  .asciiz "Raiz quadrada de "
 str_fat:  .asciiz "Fatorial de "
+str_fibo:  .asciiz "Fibonacci de "
+str_imc:  .asciiz "IMC de peso "
+str_altu: .asciiz " e altura "
 str_endl: .asciiz "\n"
 
 	.text
@@ -46,8 +49,14 @@ main:
 	addi $t1, $zero, 7	# t1 = 7, opcao de tabuada
 	beq $t0, $t1, tabuada	# vai para a tabuada
 	
+	addi $t1, $zero, 8	# t1 = 8, opcao de IMC
+	beq $t0, $t1, calc_imc	# vai para o IMC
+	
 	addi $t1, $zero, 9	# t1 = 9, opcao de fatorial
 	beq $t0, $t1, fatorial	# vai para o fatorial
+	
+	addi $t1, $zero, 10	# t1 = 10, opcao de fibonacci
+	beq $t0, $t1, fibonacci	# vai para o fibonacci
 	
 	addi $t1, $zero, 0	# t1 = 0, opcao de encerrar programa
 	beq $t0, $t1, fim_prog	# encerra o programa
@@ -169,24 +178,28 @@ raiz:
 	
 	li $v0, 6
 	syscall
-	
 	mov.s $f1, $f0
+	
 	sqrt.s $f2, $f1
 	
-	li $a0, 4
+	li $v0, 4
 	la $a0, str_sqt
 	syscall
 	
-	li $a0, 2
 	mov.s $f12, $f1
+	li $v0, 2
 	syscall
 	
-	li $a0, 4
+	li $v0, 4
 	la $a0, str_equ
 	syscall
 	
-	li $a0, 2
+	li $v0, 2
 	mov.s $f12, $f2
+	syscall
+	
+	li $v0, 4
+	la $a0, str_endl
 	syscall
 	
 	j main			#fim da execucao, volta para a main
@@ -220,17 +233,68 @@ fim_loop_tabuada:
 	j main			#fim da execucao, volta para a main
 	
 
+		
+calc_imc:
+	
+	li $v0, 6
+	syscall
+	mov.s $f1, $f0
+	
+	li $v0, 6
+	syscall	
+	mov.s $f2, $f0
+	
+	# f1 = peso, f2 = altura
+	mul.s $f3, $f2, $f2
+	div.s $f3, $f1, $f3
+	
+	mov.s $f12, $f3
+	li $v0, 2
+	syscall
+	
+	j main			#fim da execucao, volta para a main
+
 
 fatorial:
 	jal le_num
 	move $a0, $v0
-	jal calc_fatorial
+	jal calc_fatorial_rec
 	
 	move $t1, $a0	#numero
 	move $t2, $v0	#fatorial
 	
 	li $v0, 4
 	la $a0, str_fat
+	syscall
+	
+	li $v0, 1
+	move $a0, $t1
+	syscall
+	
+	li $v0, 4
+	la $a0, str_equ
+	syscall
+	
+	li $v0, 1
+	move $a0, $t2
+	syscall
+	
+	li $v0, 4
+	la $a0, str_endl
+	syscall
+	
+	j main
+	
+fibonacci:
+	jal le_num
+	move $a0, $v0
+	jal calc_fibo_rec
+	
+	move $t1, $a0	#numero
+	move $t2, $v0	#fibonacci
+	
+	li $v0, 4
+	la $a0, str_fibo
 	syscall
 	
 	li $v0, 1
@@ -273,6 +337,66 @@ fim_loop_fac:
 	lw $ra, 4($sp)
 	addi $sp, $sp, 8
 	jr $ra
+	
+## Calcula o fatorial do numero enviado em $a0, e retorna em $v0.
+calc_fatorial_rec:
+	addi $sp, $sp, -8
+	sw $a0, 0($sp)
+	sw $ra, 4($sp)
+	
+	li $t1, 1
+	
+	bne $a0, $t1, fac_rec
+	li $v0, 1
+	j return_rec
+	
+fac_rec:
+	addi $a0, $a0, -1
+	jal calc_fatorial_rec
+	addi $a0, $a0, 1
+	mul $v0, $a0, $v0
+	
+return_rec:	
+	lw $a0, 0($sp)
+	lw $ra, 4($sp)
+	addi $sp, $sp, 8
+	jr $ra
+		
+## Calcula o fatorial do numero enviado em $a0, e retorna em $v0.
+calc_fibo_rec:
+	addi $sp, $sp, -16
+	sw $a0, 0($sp)
+	sw $ra, 4($sp)
+	sw $t0, 8($sp)
+	sw $t1, 12($sp)
+	
+	li $t1, 1
+	beq $a0, $t1, default_fibo
+	li $t1, 2
+	beq $a0, $t1, default_fibo
+	
+	addi $a0, $a0, -1
+	jal calc_fibo_rec
+	move $t0, $v0
+	
+	addi $a0, $a0, -1
+	jal calc_fibo_rec
+	move $t1, $v0
+	
+	add $v0, $t0, $t1
+	j return_fibo_rec
+	
+default_fibo:
+	li $v0, 1
+
+return_fibo_rec:	
+	lw $a0, 0($sp)
+	lw $ra, 4($sp)
+	lw $t0, 8($sp)
+	lw $t1, 12($sp)
+	addi $sp, $sp, 16
+	jr $ra
+	
 
 		
 ## Imprime o resultado da operacao binaria no seguinte estilo: a OP b = c
