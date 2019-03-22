@@ -12,17 +12,14 @@ Normalmente, as famílias de processador e tals compartilham a mesma arquitetura
 ## Arquitetura de von Neumann
 
 Composta por conjunto de componentes lógicos básicos + programação.
-
 - Dados e instruções são representados na memória;
 - A memória é enderaçada pela posição e não pelo conteúdo; 
 - A execução das instruções é considerada sequencial;
 
 Hardware de proósito geral
-	
 - Programa determina uma sequência de passos; cada operação requer sinais de controle diferentes;
 
 Função da Unidade de Controle
-
 - Para cada operação, um código único é fornecido: ADD, MOVE...
 - Função da unidade de controle: interpretar o código e gerar os sinais de controle que executarão a instrução requerida
 
@@ -72,15 +69,15 @@ Dois passos:
 - Decodificação da instrução (UC decodifica a instrução e determina quais ações são necessárias, ou seja, a UC configura os sinais de controle de acordo com a instrução)
 - A execução pode ser uma das instruções:
 
-Processador-Memória: transferência de dados do processador para a memória ou da memória para o processador
+*Processador-Memória:* transferência de dados do processador para a memória ou da memória para o processador
 
-Processador-E/S: transferência de dados entre o processador e um dispositivo de E/S
+*Processador-E/S:* transferência de dados entre o processador e um dispositivo de E/S
 
-Processamento de dados: execução de operações aritméticas ou lógicas sobre os dados
+*Processamento de dados:* execução de operações aritméticas ou lógicas sobre os dados
 
-Controle: especifica que a sequência de execução de instruções seja alterada
+*Controle:* especifica que a sequência de execução de instruções seja alterada
 
-Combinação dessas 4 possibilidades
+*Combinação dessas 4 possibilidades*
 
 ### Visão de uma Máquina Hipotética
 Operações:
@@ -90,34 +87,24 @@ Operações:
 
 ### Arquitetura Simples
 Instruções de 16 bits:
-
 endereço (12) | opcode (4)
 
 # MIPS Assembly
-Some MIPS Assembly codes and notes I made to my Organization and Architecture of Computers classes.
 
-# References
-[MIPS Quick Tutorial](http://logos.cs.uic.edu/366/notes/mips%20quick%20tutorial.htm)
-
-# Notes
-
-## Assembly Simulator
-I'm currently using the [MARS MIPS Simulator](http://courses.missouristate.edu/KenVollmar/mars/download.htm).
-
-## MIPS Architecture
+## Architecture
 MIPS: Microprocessor without interlocked pipeline stages
 -32 bits
 -32 "general purposes" registers
 -32 "floating points" registers
 
 ## Labels
--Used to identify some line by reference.
+- Used to identify some line by reference.
 
 ## Data Types
 Instructions are 32-bits.
--Byte (8 bits), halfword (2 bytes), word (4 bytes);
--1 char requires 1 byte
--1 integer requires 1 word
+- Byte (8 bits), halfword (2 bytes), word (4 bytes);
+- 1 char requires 1 byte
+- 1 integer requires 1 word
 
 ## Literals
 -Numbers are represented just the way they are;
@@ -416,10 +403,10 @@ sw $a0, 0($sp)
 ```
 
 Jump options:
--j label: just jump
--$ra = return address
--jal = jump and link: jump and $ra = PC
--jr $ra = jump register
+- j label: just jump
+- $ra = return address
+- jal = jump and link: jump and $ra = PC
+- jr $ra = jump register
 
 
 ## Dynamic Allocation
