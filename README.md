@@ -432,3 +432,63 @@ syscall
 - v0 = 9: opt code for allocation
 - a0 = 40: bytes to alloc
 - the first address of the alloc'd space is stored on $v0.
+
+## Conjunto de Instruções do MIPS (ISA)
+*Intruction Set Architecture*
+
+### Tipos de Instruções
+Determina como as instruções serão divididas em campos
+
+### Métodos de Endereçamento
+Determina como cada campo será interpretado
+
+## MIPS
+
+Os tipos de instruções do MIPS.
+
+No MIPS reference tá melhor desenhado.
+
+OBS:
+- opcode: 6 bits
+- bit menos significativo: direita
+
+### Tipo R (Register)
+
+```add $t0, $t1, $t2```
+
+
+[opcode]   rs rt rd shamt [funct]
+______________________________
+31		26				 5 	 0
+
+Source, origem 1, origem 2, destino, shift amount
+
+Cada um desses tem 5 bits (pode chegar até 2^5 - 32 bits)
+
+- shamt: qtd de bits de cada deslocamento
+- funct: código das operações aritméticas e lógicas
+
+### Tipo I (Immediate)
+
+```addi $t0, $t1, 1; lw $a0, 0($sp); beq $t0, $t1, loop```
+
+[opcode] [rs] [rt]	[valor imed]
+______________________________
+31		26			15	  	 0
+
+- valor imed: valor imediato q eu to trabalhando (16 bits pra ele)
+- rs, rt: dois registradores
+
+### Tipo J (Jump)
+
+```j fatorial, jal fatorial...```
+
+[opcode]   [endereco_memoria]
+______________________________
+31		26				  	 0
+
+Ele vai pegar o endereço de 26 bits e transformar em um endereço válido.
+
+O MIPS assume que o endereço de memória é um endereço de palavra -> ele divide por 4 o endereço
+
+Modo de endereçamento pseudo-direto
