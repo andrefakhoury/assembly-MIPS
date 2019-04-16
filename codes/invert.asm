@@ -1,3 +1,6 @@
+# invert a integer
+# 256 -> 652
+
 	.data
 	
 	.text
